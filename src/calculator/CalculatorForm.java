@@ -12,7 +12,7 @@ public class CalculatorForm extends javax.swing.JFrame {
     private int numberOfChars = 1;
     enum State{
         START(0),NUM(1),COMA(2),PLUS(3),MINUS(4),
-        MULT(5),DIV(6),MOD(7),POW(8),LParen(9),RParen(10);
+        MULT(5),DIV(6),MOD(7),POW(8),LParen(9),RParen(10),ZERO(11);
         private int s;
         State(int s){
             this.s = s;
@@ -372,7 +372,7 @@ public class CalculatorForm extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         if(numberOfChars>limitOfChars)return;
-        if(jTextResult.getText().equals("0")){
+        if(state == State.START){
             jTextResult.setText("1");
         }
         else{
@@ -384,7 +384,7 @@ public class CalculatorForm extends javax.swing.JFrame {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         if(numberOfChars>limitOfChars)return;
-        if(jTextResult.getText().equals("0")){
+        if(state == State.START){
             jTextResult.setText("2");
         }
         else{
@@ -396,7 +396,7 @@ public class CalculatorForm extends javax.swing.JFrame {
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         if(numberOfChars>limitOfChars)return;
-        if(jTextResult.getText().equals("0")){
+        if(state == State.START){
             jTextResult.setText("3");
         }
         else{
@@ -408,7 +408,7 @@ public class CalculatorForm extends javax.swing.JFrame {
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
         if(numberOfChars>limitOfChars)return;
-        if(jTextResult.getText().equals("0")){
+        if(state == State.START){
             jTextResult.setText("4");
         }
         else{
@@ -420,7 +420,7 @@ public class CalculatorForm extends javax.swing.JFrame {
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
         if(numberOfChars>limitOfChars)return;
-        if(jTextResult.getText().equals("0")){
+        if(state == State.START){
             jTextResult.setText("5");
         }
         else{
@@ -432,7 +432,7 @@ public class CalculatorForm extends javax.swing.JFrame {
 
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
         if(numberOfChars>limitOfChars)return;
-        if(jTextResult.getText().equals("0")){
+        if(state == State.START){
             jTextResult.setText("6");
         }
         else{
@@ -444,7 +444,7 @@ public class CalculatorForm extends javax.swing.JFrame {
 
     private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
         if(numberOfChars>limitOfChars)return;
-        if(jTextResult.getText().equals("0")){
+        if(state == State.START){
             jTextResult.setText("7");
         }
         else{
@@ -456,7 +456,7 @@ public class CalculatorForm extends javax.swing.JFrame {
 
     private void jButton8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton8ActionPerformed
         if(numberOfChars>limitOfChars)return;
-        if(jTextResult.getText().equals("0")){
+        if(state == State.START){
             jTextResult.setText("8");
         }
         else{
@@ -468,7 +468,7 @@ public class CalculatorForm extends javax.swing.JFrame {
 
     private void jButton9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton9ActionPerformed
         if(numberOfChars>limitOfChars)return;
-        if(jTextResult.getText().equals("0")){
+        if(state == State.START){
             jTextResult.setText("9");
         }
         else{
@@ -518,12 +518,19 @@ public class CalculatorForm extends javax.swing.JFrame {
     }//GEN-LAST:event_jButtonComaActionPerformed
 
     private void jButton0ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton0ActionPerformed
-        if(numberOfChars>limitOfChars)return;
-        if(state != State.START){
+        
+        if(numberOfChars>limitOfChars || state==State.START ||state == State.ZERO)return;
+        
+        if(stateIsOper()){
             jTextResult.setText(jTextResult.getText()+"0");
-            numberOfChars++;
-            
+            state = State.ZERO;
         }
+        else if(state == State.COMA || state == State.NUM){
+            jTextResult.setText(jTextResult.getText()+"0");
+            state = State.NUM;
+        }
+ 
+        numberOfChars++;
     }//GEN-LAST:event_jButton0ActionPerformed
 
     private void jButtonPlusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonPlusActionPerformed
@@ -612,14 +619,9 @@ public class CalculatorForm extends javax.swing.JFrame {
 
     private void jButtonRParenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRParenActionPerformed
         if(numberOfChars>limitOfChars)return;
-        if(stateIsOper()|| state==State.NUM){
-            if(parenCount>0){
-                parenCount--;
-            }
-            else{
-                JOptionPane.showMessageDialog(this, "syntax error", "", JOptionPane.ERROR_MESSAGE, null);
-                return;
-            }
+        if(state==State.NUM){
+            
+            parenCount--;
             jTextResult.setText(jTextResult.getText()+")");
             state = State.RParen;
             pos = 1000;
@@ -637,6 +639,10 @@ public class CalculatorForm extends javax.swing.JFrame {
             state = State.LParen;
             parenCount++;
             numberOfChars++;
+        }
+        else if(state == State.START){
+            jTextResult.setText("(");
+            state = State.LParen;
         }
         else{
             JOptionPane.showMessageDialog(this, "syntax error", "", JOptionPane.ERROR_MESSAGE, null);
