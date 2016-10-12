@@ -10,21 +10,10 @@ public class CalculatorForm extends javax.swing.JFrame {
     private int pos = 0;
     private final int limitOfChars = 25;
     private int numberOfChars = 1;
-    enum State{
-        START(0),NUM(1),COMA(2),PLUS(3),MINUS(4),
-        MULT(5),DIV(6),MOD(7),POW(8),LParen(9),RParen(10),ZERO(11);
-        private int s;
-        State(int s){
-            this.s = s;
-        }
-
-        public int getS() {
-            return s;
-        }
-    }
-    State state = State.START;
+    private State state = State.START;
+    private StringBuffer stringToParse = new StringBuffer();
+    private StackParser parser = new StackParser();
     
-    StringBuffer stringToParse = new StringBuffer();
     public CalculatorForm() {
         initComponents();
         

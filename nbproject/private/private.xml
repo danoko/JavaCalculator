@@ -5,6 +5,8 @@
         <group>
             <file>file:/E:/netbeans%20projects/Calculator/src/calculator/Calculator.java</file>
             <file>file:/E:/netbeans%20projects/Calculator/src/calculator/CalculatorForm.java</file>
+            <file>file:/E:/netbeans%20projects/Calculator/src/calculator/StackParser.java</file>
+            <file>file:/E:/netbeans%20projects/Calculator/src/calculator/State.java</file>
         </group>
     </open-files>
 </project-private>
