@@ -10,6 +10,7 @@ public class StackParser {
     private StringBuilder parsedString = new StringBuilder();
     private State state;
     private Stack<Character> operatorStack = new Stack<Character>();
+    private Stack<Double>valueStack = new Stack<Double>();
     
     private boolean isOper(char c){
         switch(c){
@@ -38,7 +39,11 @@ public class StackParser {
                 return 1;
             case '-':
                 return 1;
-            case '*'|'/'|'%':
+            case '*':
+                return 2;
+            case '/':
+                return 2;
+            case '%':
                 return 2;
             case '^':
                 return 3;
@@ -50,8 +55,8 @@ public class StackParser {
         return 0;
     }
     private void putOnOperatorStack(char c){
-        if(operatorStack.empty() || c=='('){
-            operatorStack.add(c);
+        if(operatorStack.empty() || c=='(' || operatorStack.peek()=='('){
+            operatorStack.push(c);
         }
         else if(evalPrecedence(c)>evalPrecedence(operatorStack.peek())){
             operatorStack.push(c);
@@ -63,13 +68,8 @@ public class StackParser {
             operatorStack.pop();
         }
         else {
-            if(operatorStack.peek()=='('){
-                operatorStack.push(c);
-            }
-            else{
                 parsedString.append(operatorStack.pop());
                 putOnOperatorStack(c);
-            }
         }
     }
     
@@ -80,7 +80,43 @@ public class StackParser {
     public StackParser() {
         state = State.START;
     }
-    
+    private void performOperation(char c){
+        double x,y;
+        switch(c){
+            case '+':
+                y = valueStack.pop();
+                x = valueStack.pop();
+                valueStack.push(x+y);
+                break;
+            case '-':
+                y = valueStack.pop();
+                x = valueStack.pop();
+                valueStack.push(x-y);
+                break;
+            case '*':
+                y = valueStack.pop();
+                x = valueStack.pop();
+                valueStack.push(x*y);
+                break;
+            case '/':
+                y = valueStack.pop();
+                x = valueStack.pop();
+                if(y==0)
+                    throw new IllegalArgumentException("ARG 0!");
+                valueStack.push(x/y);
+                break;
+            case '%':
+                y = valueStack.pop();
+                x = valueStack.pop();
+                valueStack.push(x%y);
+                break;
+            case '^':
+                y = valueStack.pop();
+                x = valueStack.pop();
+                valueStack.push(Math.pow(x, y));
+                break;
+        }
+    }
     public void parse(){
         int i = 0;
 
@@ -109,8 +145,32 @@ public class StackParser {
         while(!operatorStack.empty()){
             parsedString.append(operatorStack.pop());
         }
+        parsedString.append("\0");
         System.out.println(parsedString);
+        evaluate();
     }
-    
-    
+    public void evaluate(){
+        int i=0;
+        char c;
+        StringBuilder num = new StringBuilder();
+        while(i<parsedString.length()){
+            num.setLength(60);
+            c = parsedString.charAt(i);
+            if(Character.isDigit(c)){
+                while(Character.isDigit(c)){
+                    num.append(c);
+                    i++;
+                    c = parsedString.charAt(i);
+                } 
+                valueStack.push(Double.parseDouble(num.toString()));
+            }//end of isDigit test
+            if (isOper(c)){
+                performOperation(c);
+            }
+            i++;    
+        } //end of evaluating loop
+        System.out.println(valueStack.peek());
+    }
+
+   
 }

@@ -7,9 +7,13 @@ public class Calculator {
     public static void main(String[] args) {
         //CalculatorForm form = new CalculatorForm();
         //form.setVisible(true);
-        StackParser parser = new StackParser();
-        StringBuilder sb = new StringBuilder("45.98+(9.0-11)-(9*9)");
-        parser.setStringToParse(sb);
-        parser.parse();
+        try{
+            StackParser parser = new StackParser();
+            StringBuilder sb = new StringBuilder("4-1+11*(3+3)/2^2");
+            parser.setStringToParse(sb);
+            parser.parse();
+        }catch(Exception e){
+            System.out.println(e.getMessage());
+        }
     }
 }
