@@ -11,6 +11,10 @@ public class StackParser {
     private State state;
     private Stack<Character> operatorStack = new Stack<Character>();
     private Stack<Double>valueStack = new Stack<Double>();
+
+    public Stack<Double> getValueStack() {
+        return valueStack;
+    }
     
     private boolean isOper(char c){
         switch(c){
@@ -146,8 +150,8 @@ public class StackParser {
             parsedString.append(operatorStack.pop());
         }
         parsedString.append("\0");
-        System.out.println(parsedString);
-        evaluate();
+        System.out.println(parsedString.toString());
+        //evaluate();
     }
     public void evaluate(){
         int i=0;
@@ -157,20 +161,19 @@ public class StackParser {
             num.setLength(60);
             c = parsedString.charAt(i);
             if(Character.isDigit(c)){
-                while(Character.isDigit(c)){
+                while(Character.isDigit(c)|| c=='.'){
                     num.append(c);
                     i++;
                     c = parsedString.charAt(i);
                 } 
                 valueStack.push(Double.parseDouble(num.toString()));
+
             }//end of isDigit test
             if (isOper(c)){
                 performOperation(c);
             }
             i++;    
         } //end of evaluating loop
-        System.out.println(valueStack.peek());
+        
     }
-
-   
 }

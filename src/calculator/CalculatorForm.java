@@ -1,6 +1,8 @@
 
 package calculator;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import javax.swing.JOptionPane;
 
 public class CalculatorForm extends javax.swing.JFrame {
@@ -11,8 +13,10 @@ public class CalculatorForm extends javax.swing.JFrame {
     private final int limitOfChars = 25;
     private int numberOfChars = 1;
     private State state = State.START;
+    private State lastOp;
     private StringBuffer stringToParse = new StringBuffer();
-    private StackParser parser = new StackParser();
+    private StackParser parser;
+    private double result;
     
     public CalculatorForm() {
         initComponents();
@@ -168,6 +172,11 @@ public class CalculatorForm extends javax.swing.JFrame {
 
         jButtonEqu.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         jButtonEqu.setText("=");
+        jButtonEqu.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonEquActionPerformed(evt);
+            }
+        });
 
         jButton0.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         jButton0.setText("0");
@@ -479,7 +488,7 @@ public class CalculatorForm extends javax.swing.JFrame {
 
     private void jButtonFlipSignActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonFlipSignActionPerformed
         
-        if(!jTextResult.getText().equals("0")&& pos < jTextResult.getText().length()-1){
+        if(!jTextResult.getText().equals("0")){
             if(jTextResult.getText().charAt(pos+1)=='-'){
                StringBuilder sb =new StringBuilder(jTextResult.getText().substring(0,pos+1)).
                        append(jTextResult.getText().substring(pos+2));
@@ -637,6 +646,32 @@ public class CalculatorForm extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "syntax error", "", JOptionPane.ERROR_MESSAGE, null);
         }
     }//GEN-LAST:event_jButtonLParenActionPerformed
+
+    private void jButtonEquActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonEquActionPerformed
+       if((state==State.NUM)||(state==State.RParen)||(parenCount!=0))
+       {
+            parser = new StackParser();
+            parser.setStringToParse(new StringBuilder(jTextResult.getText()));
+            parser.parse();
+            parser.evaluate();
+            result = parser.getValueStack().pop();
+            DecimalFormat format = new DecimalFormat();
+            format.setMinimumFractionDigits(0);
+            DecimalFormatSymbols sym = new DecimalFormatSymbols();
+            sym.setDecimalSeparator('.');
+            format.setDecimalFormatSymbols(sym);
+            
+            jTextResult.setText(format.format(result));
+            state = State.NUM;
+            numberOfChars = jTextResult.getText().length()-1;
+            
+       }
+       else{
+           JOptionPane.showMessageDialog(this,"syntax error","",JOptionPane.ERROR_MESSAGE);
+           return;
+       }
+      
+    }//GEN-LAST:event_jButtonEquActionPerformed
     private boolean stateIsOper(){
         switch(state.getS()){
             case 0:
