@@ -17,7 +17,7 @@ public class CalculatorForm extends javax.swing.JFrame {
     private StringBuffer stringToParse = new StringBuffer();
     private StackParser parser;
     private double result;
-    
+    private boolean uminus = false;
     public CalculatorForm() {
         initComponents();
         
@@ -483,26 +483,45 @@ public class CalculatorForm extends javax.swing.JFrame {
             pos = 0;
             numberOfChars = 1;
             state = State.START;
+            uminus = false;
         }
     }//GEN-LAST:event_jButtonClearActionPerformed
 
     private void jButtonFlipSignActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonFlipSignActionPerformed
-        
-        if(!jTextResult.getText().equals("0")){
-            if(jTextResult.getText().charAt(pos+1)=='-'){
-               StringBuilder sb =new StringBuilder(jTextResult.getText().substring(0,pos+1)).
-                       append(jTextResult.getText().substring(pos+2));
-               jTextResult.setText(sb.toString());
-               numberOfChars--;
+        if(jTextResult.getText().charAt(jTextResult.getText().length()-1)==')'||jTextResult.getText().equals("0"))
+            return;
+        int p = findLastOp();
+        if(!uminus){
+            if(p==0){
+                jTextResult.setText("-"+jTextResult.getText());
             }
             else{
-                if(numberOfChars>limitOfChars)return;
-                StringBuilder sb =new StringBuilder(jTextResult.getText().substring(0,pos+1)).
-                        append("-").append(jTextResult.getText().substring(pos+1));
-               jTextResult.setText(sb.toString());
-               numberOfChars++;
+                StringBuilder sb = new StringBuilder(jTextResult.getText().subSequence(0, p+1));
+                sb.append("-").append(jTextResult.getText().substring(p+1));
+                jTextResult.setText(sb.toString());    
             }
+            uminus = true;
         }
+        else{
+            if(p==0){
+                jTextResult.setText(jTextResult.getText().substring(1));
+            }
+            else{
+                StringBuilder sb = new StringBuilder(jTextResult.getText().subSequence(0, p));
+                sb.append(jTextResult.getText().substring(p+1));
+                jTextResult.setText(sb.toString());
+            }
+            uminus = false;
+        }
+        
+        
+        
+        
+        
+        
+        
+        
+        
     }//GEN-LAST:event_jButtonFlipSignActionPerformed
 
     private void jButtonComaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonComaActionPerformed
@@ -664,7 +683,8 @@ public class CalculatorForm extends javax.swing.JFrame {
             jTextResult.setText(format.format(result));
             state = State.NUM;
             numberOfChars = jTextResult.getText().length()-1;
-            
+            if(result<0)
+                uminus = true;
        }
        else{
            JOptionPane.showMessageDialog(this,"syntax error","",JOptionPane.ERROR_MESSAGE);
@@ -683,6 +703,28 @@ public class CalculatorForm extends javax.swing.JFrame {
             default:
                 return true;
         }
+    }
+    int findLastOp(){
+        
+        for(int i=jTextResult.getText().length()-1;i>=0;i--){
+            switch(jTextResult.getText().charAt(i)){
+                case '+':
+                    return i;
+                case '-':
+                    return i;
+                case '*':
+                    return i;
+                case '/':
+                    return i;
+                case '%':
+                    return i;
+                case '^':
+                    return i;
+                default:
+                    continue;
+            }
+        }
+        return 0;
     }
     public static void main(String args[]) {
        
