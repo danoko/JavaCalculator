@@ -9,11 +9,9 @@ public class CalculatorForm extends javax.swing.JFrame {
 
     private boolean comaFlag = false;
     private int parenCount = 0;
-    private int pos = 0;
     private final int limitOfChars = 25;
     private int numberOfChars = 1;
     private State state = State.START;
-    private State lastOp;
     private StringBuffer stringToParse = new StringBuffer();
     private StackParser parser;
     private double result;
@@ -480,7 +478,6 @@ public class CalculatorForm extends javax.swing.JFrame {
         if(!jTextResult.getText().equals("0")){
             jTextResult.setText("0");
             comaFlag = false;
-            pos = 0;
             numberOfChars = 1;
             state = State.START;
             uminus = false;
@@ -501,6 +498,7 @@ public class CalculatorForm extends javax.swing.JFrame {
                 jTextResult.setText(sb.toString());    
             }
             uminus = true;
+            numberOfChars++;
         }
         else{
             if(p==0){
@@ -512,6 +510,7 @@ public class CalculatorForm extends javax.swing.JFrame {
                 jTextResult.setText(sb.toString());
             }
             uminus = false;
+            numberOfChars--;
         }
         
         
@@ -538,7 +537,7 @@ public class CalculatorForm extends javax.swing.JFrame {
         
         if(numberOfChars>limitOfChars || state==State.START ||state == State.ZERO)return;
         
-        if(stateIsOper()){
+        if(state==State.OPER){
             jTextResult.setText(jTextResult.getText()+"0");
             state = State.ZERO;
         }
@@ -552,10 +551,9 @@ public class CalculatorForm extends javax.swing.JFrame {
 
     private void jButtonPlusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonPlusActionPerformed
         if(numberOfChars>limitOfChars)return;
-        if(state == State.NUM || state==State.RParen){
+        if(state == State.NUM || state==State.RParen||state==State.ZERO){
             jTextResult.setText(jTextResult.getText()+"+");
-            state = State.PLUS;
-            pos = jTextResult.getText().length()-1;
+            state = State.OPER;
             numberOfChars++;
             comaFlag = false;
         }
@@ -566,10 +564,10 @@ public class CalculatorForm extends javax.swing.JFrame {
 
     private void jButtonMinusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonMinusActionPerformed
         if(numberOfChars>limitOfChars)return; 
-        if(state == State.NUM || state==State.RParen){
+        if(state == State.NUM || state==State.RParen||state==State.ZERO){
             jTextResult.setText(jTextResult.getText()+"-");
-            state = State.MINUS;
-            pos = jTextResult.getText().length()-1;
+            state = State.OPER;
+        
             numberOfChars++;
             comaFlag = false;
         }
@@ -580,10 +578,10 @@ public class CalculatorForm extends javax.swing.JFrame {
 
     private void jButtonMultActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonMultActionPerformed
         if(numberOfChars>limitOfChars)return; 
-        if(state == State.NUM || state==State.RParen){
+        if(state == State.NUM || state==State.RParen||state==State.ZERO){
             jTextResult.setText(jTextResult.getText()+"*");
-            state = State.MULT;
-            pos = jTextResult.getText().length()-1;
+            state = State.OPER;
+      
             numberOfChars++;
             comaFlag = false;
         }
@@ -594,10 +592,10 @@ public class CalculatorForm extends javax.swing.JFrame {
 
     private void jButtonDivActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonDivActionPerformed
         if(numberOfChars>limitOfChars)return; 
-        if(state == State.NUM || state==State.RParen){
+        if(state == State.NUM || state==State.RParen||state==State.ZERO){
             jTextResult.setText(jTextResult.getText()+"/");
-            state = State.DIV;
-            pos = jTextResult.getText().length()-1;
+            state = State.OPER;
+
             numberOfChars++;
             comaFlag = false;
         }
@@ -608,10 +606,9 @@ public class CalculatorForm extends javax.swing.JFrame {
 
     private void jButtonModActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonModActionPerformed
         if(numberOfChars>limitOfChars)return; 
-        if(state == State.NUM || state==State.RParen){
+        if(state == State.NUM || state==State.RParen||state==State.ZERO){
             jTextResult.setText(jTextResult.getText()+"%");
-            state = State.MOD;
-            pos = jTextResult.getText().length()-1;
+            state = State.OPER;
             numberOfChars++;
             comaFlag = false;
         }
@@ -622,10 +619,9 @@ public class CalculatorForm extends javax.swing.JFrame {
 
     private void jButtonPowActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonPowActionPerformed
         if(numberOfChars>limitOfChars)return; 
-        if(state == State.NUM || state==State.RParen){
+        if(state == State.NUM || state==State.RParen||state==State.ZERO){
             jTextResult.setText(jTextResult.getText()+"^");
-            state = State.POW;
-            pos = jTextResult.getText().length()-1;
+            state = State.OPER;
             numberOfChars++;
             comaFlag = false;
         }
@@ -641,7 +637,6 @@ public class CalculatorForm extends javax.swing.JFrame {
             parenCount--;
             jTextResult.setText(jTextResult.getText()+")");
             state = State.RParen;
-            pos = 1000;
             numberOfChars++;
         }
         else {
@@ -651,15 +646,16 @@ public class CalculatorForm extends javax.swing.JFrame {
 
     private void jButtonLParenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonLParenActionPerformed
         if(numberOfChars>limitOfChars)return;
-        if(stateIsOper()){
+        if(state == State.OPER){
             jTextResult.setText(jTextResult.getText()+"(");
-            state = State.LParen;
+            state = State.OPER;
             parenCount++;
             numberOfChars++;
         }
         else if(state == State.START){
             jTextResult.setText("(");
-            state = State.LParen;
+            state = State.OPER;
+            parenCount++;
         }
         else{
             JOptionPane.showMessageDialog(this, "syntax error", "", JOptionPane.ERROR_MESSAGE, null);
@@ -667,8 +663,13 @@ public class CalculatorForm extends javax.swing.JFrame {
     }//GEN-LAST:event_jButtonLParenActionPerformed
 
     private void jButtonEquActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonEquActionPerformed
-       if((state==State.NUM)||(state==State.RParen)||(parenCount!=0))
+       if((state==State.NUM)||(state==State.RParen))
        {
+            if(parenCount!=0){
+                JOptionPane.showMessageDialog(this,"error unbalanced paretheses","",JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+                
             parser = new StackParser();
             parser.setStringToParse(new StringBuilder(jTextResult.getText()));
             parser.parse();
@@ -692,18 +693,7 @@ public class CalculatorForm extends javax.swing.JFrame {
        }
       
     }//GEN-LAST:event_jButtonEquActionPerformed
-    private boolean stateIsOper(){
-        switch(state.getS()){
-            case 0:
-                return false;
-            case 1:
-                return false;
-            case 2:
-                return false;
-            default:
-                return true;
-        }
-    }
+    
     int findLastOp(){
         
         for(int i=jTextResult.getText().length()-1;i>=0;i--){

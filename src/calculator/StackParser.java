@@ -8,10 +8,9 @@ import java.util.Stack;
 public class StackParser {
     private StringBuilder stringToParse;
     private StringBuilder parsedString = new StringBuilder();
-    private State state;
     private Stack<Character> operatorStack = new Stack<Character>();
     private Stack<Double>valueStack = new Stack<Double>();
-
+    private char lastOp;
     public Stack<Double> getValueStack() {
         return valueStack;
     }
@@ -33,6 +32,8 @@ public class StackParser {
             case '(':
                 return true;
             case ')':
+                return true;
+            case '~':
                 return true;
             default: return false;
         }
@@ -80,10 +81,6 @@ public class StackParser {
     public void setStringToParse(StringBuilder stringToParse) {
         this.stringToParse = stringToParse.append("\0");
     }
-
-    public StackParser() {
-        state = State.START;
-    }
     private void performOperation(char c){
         double x,y;
         switch(c){
@@ -119,14 +116,41 @@ public class StackParser {
                 x = valueStack.pop();
                 valueStack.push(Math.pow(x, y));
                 break;
+            case '~':
+                y = valueStack.pop();
+                valueStack.push(-y);
+                break;
+        }
+        
+    }
+    
+    private boolean itIsUMinus(){
+        switch(lastOp){
+            case '+':
+                return true;
+            case '-':
+                return true;
+            case '*':
+                return true;
+            case '/':
+                return true;
+            case '%':
+                return true;
+            case '^':
+                return true;
+            case '(':
+                return true;
+            default:
+                return false;
         }
     }
+    
     public void parse(){
         int i = 0;
 
         StringBuilder num = new StringBuilder("");
         while(i<stringToParse.length()){
-            if(state == State.OPER && stringToParse.charAt(i)=='-'){
+            if(itIsUMinus() && stringToParse.charAt(i)=='-'){
                 putOnOperatorStack('~');
                 i++;
                 continue;
@@ -134,24 +158,21 @@ public class StackParser {
             while(Character.isDigit(stringToParse.charAt(i))|| stringToParse.charAt(i)=='.'){
               parsedString.append(stringToParse.charAt(i));
               i++;
-              state = State.NUM;
+
             }
             parsedString.append(" ");
             if(isOper(stringToParse.charAt(i))){
                 
                 putOnOperatorStack(stringToParse.charAt(i));
-                state = State.OPER;
-            
+                lastOp=stringToParse.charAt(i);
             }
             i++;
-            
         }
         while(!operatorStack.empty()){
             parsedString.append(operatorStack.pop());
         }
         parsedString.append("\0");
-        System.out.println(parsedString.toString());
-        //evaluate();
+        
     }
     public void evaluate(){
         int i=0;
