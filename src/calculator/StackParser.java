@@ -11,8 +11,18 @@ public class StackParser {
     private Stack<Character> operatorStack = new Stack<Character>();
     private Stack<Double>valueStack = new Stack<Double>();
     private char lastOp;
+    private double x=0, y=0;
+    
     public Stack<Double> getValueStack() {
         return valueStack;
+    }
+
+    public double getY() {
+        return y;
+    }
+    
+    public char getLastOp() {
+        return lastOp;
     }
     
     private boolean isOper(char c){
@@ -82,7 +92,6 @@ public class StackParser {
         this.stringToParse = stringToParse.append("\0");
     }
     private void performOperation(char c){
-        double x,y;
         switch(c){
             case '+':
                 y = valueStack.pop();
@@ -162,7 +171,6 @@ public class StackParser {
             }
             parsedString.append(" ");
             if(isOper(stringToParse.charAt(i))){
-                
                 putOnOperatorStack(stringToParse.charAt(i));
                 lastOp=stringToParse.charAt(i);
             }

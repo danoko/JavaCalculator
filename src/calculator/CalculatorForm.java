@@ -3,6 +3,8 @@ package calculator;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
 
 public class CalculatorForm extends javax.swing.JFrame {
@@ -13,12 +15,16 @@ public class CalculatorForm extends javax.swing.JFrame {
     private int numberOfChars = 1;
     private State state = State.START;
     private StringBuffer stringToParse = new StringBuffer();
-    private StackParser parser;
+    private StackParser parser = new StackParser();
     private double result;
     private boolean uminus = false;
+    private DecimalFormat format = new DecimalFormat();
+    private DecimalFormatSymbols symbol = new DecimalFormatSymbols();
     public CalculatorForm() {
         initComponents();
-        
+        format.setMinimumFractionDigits(0);
+        symbol.setDecimalSeparator('.');
+        format.setDecimalFormatSymbols(symbol);
     }
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -531,6 +537,13 @@ public class CalculatorForm extends javax.swing.JFrame {
             numberOfChars++;
             state = State.COMA;
         }
+        else if(jTextResult.getText().charAt(jTextResult.getText().length()-1)=='.'){
+            jTextResult.setText(jTextResult.getText().substring(0,jTextResult.getText().length()-1));
+            comaFlag=false;
+            numberOfChars--;
+            state = State.NUM;
+        }
+        
     }//GEN-LAST:event_jButtonComaActionPerformed
 
     private void jButton0ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton0ActionPerformed
@@ -551,83 +564,74 @@ public class CalculatorForm extends javax.swing.JFrame {
 
     private void jButtonPlusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonPlusActionPerformed
         if(numberOfChars>limitOfChars)return;
-        if(state == State.NUM || state==State.RParen||state==State.ZERO){
-            jTextResult.setText(jTextResult.getText()+"+");
-            state = State.OPER;
-            numberOfChars++;
-            comaFlag = false;
-        }
-        else{
+        if(state == State.OPER || state==State.LPAREN){
             JOptionPane.showMessageDialog(this, "syntax error", "", JOptionPane.ERROR_MESSAGE, null);
+            return;
         }
+        jTextResult.setText(jTextResult.getText()+"+");
+        state = State.OPER;
+        numberOfChars++;
+        comaFlag = false;
     }//GEN-LAST:event_jButtonPlusActionPerformed
 
     private void jButtonMinusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonMinusActionPerformed
         if(numberOfChars>limitOfChars)return; 
-        if(state == State.NUM || state==State.RParen||state==State.ZERO){
-            jTextResult.setText(jTextResult.getText()+"-");
-            state = State.OPER;
-        
-            numberOfChars++;
-            comaFlag = false;
-        }
-        else{
+        if(state == State.COMA){
             JOptionPane.showMessageDialog(this, "syntax error", "", JOptionPane.ERROR_MESSAGE, null);
+            return;
         }
+        jTextResult.setText(jTextResult.getText()+"-");
+        state = State.OPER;
+        numberOfChars++;
+        comaFlag = false;
     }//GEN-LAST:event_jButtonMinusActionPerformed
 
     private void jButtonMultActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonMultActionPerformed
-        if(numberOfChars>limitOfChars)return; 
-        if(state == State.NUM || state==State.RParen||state==State.ZERO){
-            jTextResult.setText(jTextResult.getText()+"*");
-            state = State.OPER;
-      
-            numberOfChars++;
-            comaFlag = false;
-        }
-        else{
+        if(numberOfChars>limitOfChars)return;
+        if(state == State.OPER || state==State.LPAREN){
             JOptionPane.showMessageDialog(this, "syntax error", "", JOptionPane.ERROR_MESSAGE, null);
+            return;
         }
+        jTextResult.setText(jTextResult.getText()+"*");
+        state = State.OPER;
+        numberOfChars++;
+        comaFlag = false;
     }//GEN-LAST:event_jButtonMultActionPerformed
 
     private void jButtonDivActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonDivActionPerformed
-        if(numberOfChars>limitOfChars)return; 
-        if(state == State.NUM || state==State.RParen||state==State.ZERO){
-            jTextResult.setText(jTextResult.getText()+"/");
-            state = State.OPER;
-
-            numberOfChars++;
-            comaFlag = false;
-        }
-        else{
+        if(numberOfChars>limitOfChars)return;
+        if(state == State.OPER || state==State.LPAREN){
             JOptionPane.showMessageDialog(this, "syntax error", "", JOptionPane.ERROR_MESSAGE, null);
+            return;
         }
+        jTextResult.setText(jTextResult.getText()+"/");
+        state = State.OPER;
+        numberOfChars++;
+        comaFlag = false;
     }//GEN-LAST:event_jButtonDivActionPerformed
 
     private void jButtonModActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonModActionPerformed
-        if(numberOfChars>limitOfChars)return; 
-        if(state == State.NUM || state==State.RParen||state==State.ZERO){
-            jTextResult.setText(jTextResult.getText()+"%");
-            state = State.OPER;
-            numberOfChars++;
-            comaFlag = false;
-        }
-        else{
+        if(numberOfChars>limitOfChars)return;
+        if(state == State.OPER || state==State.LPAREN){
             JOptionPane.showMessageDialog(this, "syntax error", "", JOptionPane.ERROR_MESSAGE, null);
+            return;
         }
+        jTextResult.setText(jTextResult.getText()+"%");
+        state = State.OPER;
+        numberOfChars++;
+        comaFlag = false;
     }//GEN-LAST:event_jButtonModActionPerformed
 
     private void jButtonPowActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonPowActionPerformed
-        if(numberOfChars>limitOfChars)return; 
-        if(state == State.NUM || state==State.RParen||state==State.ZERO){
-            jTextResult.setText(jTextResult.getText()+"^");
-            state = State.OPER;
-            numberOfChars++;
-            comaFlag = false;
-        }
-        else{
+        if(numberOfChars>limitOfChars)return;
+        if(state == State.OPER || state==State.LPAREN){
             JOptionPane.showMessageDialog(this, "syntax error", "", JOptionPane.ERROR_MESSAGE, null);
+            return;
         }
+        jTextResult.setText(jTextResult.getText()+"^");
+        state = State.OPER;
+        numberOfChars++;
+        comaFlag = false;
     }//GEN-LAST:event_jButtonPowActionPerformed
 
     private void jButtonRParenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRParenActionPerformed
@@ -663,35 +667,37 @@ public class CalculatorForm extends javax.swing.JFrame {
     }//GEN-LAST:event_jButtonLParenActionPerformed
 
     private void jButtonEquActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonEquActionPerformed
-       if((state==State.NUM)||(state==State.RParen))
-       {
-            if(parenCount!=0){
-                JOptionPane.showMessageDialog(this,"error unbalanced paretheses","",JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-                
-            parser = new StackParser();
+        if(parenCount!=0){
+            JOptionPane.showMessageDialog(this,"error unbalanced paretheses","",JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        if((state==State.NUM)||(state==State.RParen))
+        {
             parser.setStringToParse(new StringBuilder(jTextResult.getText()));
             parser.parse();
             parser.evaluate();
             result = parser.getValueStack().pop();
-            DecimalFormat format = new DecimalFormat();
-            format.setMinimumFractionDigits(0);
-            DecimalFormatSymbols sym = new DecimalFormatSymbols();
-            sym.setDecimalSeparator('.');
-            format.setDecimalFormatSymbols(sym);
-            
             jTextResult.setText(format.format(result));
-            state = State.NUM;
-            numberOfChars = jTextResult.getText().length()-1;
-            if(result<0)
+            state = State.RESULT;
+        }
+        else if(state==State.RESULT){
+            char c = parser.getLastOp();
+            double y = parser.getY();
+            parser.setStringToParse(new StringBuilder(jTextResult.getText()+c+y+""));
+            parser.parse();
+            parser.evaluate();
+            jTextResult.setText(format.format(parser.getValueStack().peek()));
+        }
+        
+        Pattern pattern = Pattern.compile("(\\.)");
+        Matcher matcher = pattern.matcher(jTextResult.getText());
+        if(matcher.find())
+            comaFlag=true;
+
+        numberOfChars = jTextResult.getText().length();
+        if(result<0)
                 uminus = true;
-       }
-       else{
-           JOptionPane.showMessageDialog(this,"syntax error","",JOptionPane.ERROR_MESSAGE);
-           return;
-       }
-      
     }//GEN-LAST:event_jButtonEquActionPerformed
     
     int findLastOp(){
