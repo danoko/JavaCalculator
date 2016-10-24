@@ -4,6 +4,7 @@ Project originally written in netbeans 8.0.2 with
 java version 1.8.0_101
 
 Features:
-
-        * Swing GUI
-        * perforrms operations on +,-,*,/,%(mod),^(pow)
+<ul>
+ <li>swing GUI</li>
+ <li>perforrms operations on +,-,*,/,%(mod),^(pow)</li>
+</ul>
