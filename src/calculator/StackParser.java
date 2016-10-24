@@ -156,10 +156,10 @@ public class StackParser {
     
     public void parse(){
         int i = 0;
-
         StringBuilder num = new StringBuilder("");
+        
         while(i<stringToParse.length()){
-            if(itIsUMinus() && stringToParse.charAt(i)=='-'){
+            if((i==0&&stringToParse.charAt(i)=='-')||itIsUMinus() && stringToParse.charAt(i)=='-'){
                 putOnOperatorStack('~');
                 i++;
                 continue;

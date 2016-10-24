@@ -9,14 +9,21 @@ import javax.swing.JOptionPane;
 
 public class CalculatorForm extends javax.swing.JFrame {
 
+    //comaFlag is to control the use of decimal places character
     private boolean comaFlag = false;
+    //value parenCount is to test if parentheses are balanced
     private int parenCount = 0;
+    //maximal limit of chars that can fit into textbox
     private final int limitOfChars = 25;
+    //current number of chars it gets incremented with every number\operator button click
     private int numberOfChars = 1;
+    //enumerative type stores states of key input
     private State state = State.START;
     private StringBuffer stringToParse = new StringBuffer();
+    //class defined in StackParser.java
     private StackParser parser = new StackParser();
     private double result;
+    //flag of state to control the use of +\- button
     private boolean uminus = false;
     private DecimalFormat format = new DecimalFormat();
     private DecimalFormatSymbols symbol = new DecimalFormatSymbols();
@@ -479,7 +486,8 @@ public class CalculatorForm extends javax.swing.JFrame {
         state = State.NUM;
         numberOfChars++;
     }//GEN-LAST:event_jButton9ActionPerformed
-
+    //button clear resets all control values and settings 
+    //to start state
     private void jButtonClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonClearActionPerformed
         if(!jTextResult.getText().equals("0")){
             jTextResult.setText("0");
@@ -491,8 +499,20 @@ public class CalculatorForm extends javax.swing.JFrame {
     }//GEN-LAST:event_jButtonClearActionPerformed
 
     private void jButtonFlipSignActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonFlipSignActionPerformed
+        //This function flips between negative and positive of last value in textbox display.
+        //The display of the last number string will be altered 
+        //whether the uminus flag is true or false
+        //eg: 
+            //flag uminus==false
+            //11+2; button +\- clicked   display shows ->
+            //flag uminus==true
+            //11+-2 button +\- clicked again display shows ->
+            //11+2
         if(jTextResult.getText().charAt(jTextResult.getText().length()-1)==')'||jTextResult.getText().equals("0"))
             return;
+        
+        //function find last op returns the index of last operator
+        //the int p value stores index of last oper is used to build string 
         int p = findLastOp();
         if(!uminus){
             if(p==0){
@@ -518,14 +538,6 @@ public class CalculatorForm extends javax.swing.JFrame {
             uminus = false;
             numberOfChars--;
         }
-        
-        
-        
-        
-        
-        
-        
-        
         
     }//GEN-LAST:event_jButtonFlipSignActionPerformed
 
@@ -554,7 +566,7 @@ public class CalculatorForm extends javax.swing.JFrame {
             jTextResult.setText(jTextResult.getText()+"0");
             state = State.ZERO;
         }
-        else if(state == State.COMA || state == State.NUM){
+        else if(state == State.COMA || state == State.NUM||state==State.RESULT){
             jTextResult.setText(jTextResult.getText()+"0");
             state = State.NUM;
         }
