@@ -6,5 +6,5 @@ java version 1.8.0_101
 Features:
 <ul>
  <li>swing GUI</li>
- <li>perforrms operations on +,-,*,/,%(mod),^(pow)</li>
+ <li>perforrms operations on "+","-","*","/","%"(mod),"^"(pow)</li>
 </ul>
