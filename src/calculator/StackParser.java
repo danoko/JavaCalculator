@@ -12,6 +12,7 @@ public class StackParser {
     private Stack<Double>valueStack = new Stack<Double>();
     private char lastOp;
     private double x=0, y=0;
+   
     
     public Stack<Double> getValueStack() {
         return valueStack;
