@@ -4,6 +4,5 @@ Project originally written in netbeans 8.0.2 with
 java version 1.8.0_101
 
 Features:
-Markup
-*swing GUI
-*perforrms operations on +,-,*,/,%(mod),^(pow)
+Markup : * Swing GUI
+         * perforrms operations on +,-,*,/,%(mod),^(pow)
