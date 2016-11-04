@@ -493,6 +493,7 @@ public class CalculatorForm extends javax.swing.JFrame {
             jTextResult.setText("0");
             comaFlag = false;
             numberOfChars = 1;
+            parenCount = 0;
             state = State.START;
             uminus = false;
         }
