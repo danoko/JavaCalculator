@@ -3,6 +3,7 @@ package calculator;
 
 
 import java.util.Stack;
+import javax.swing.JOptionPane;
 
 
 public class StackParser {
@@ -12,7 +13,11 @@ public class StackParser {
     private Stack<Double>valueStack = new Stack<Double>();
     private char lastOp;
     private double x=0, y=0;
-   
+    private boolean error = false;
+
+    public boolean isError() {
+        return error;
+    }
     
     public Stack<Double> getValueStack() {
         return valueStack;
@@ -93,6 +98,7 @@ public class StackParser {
         this.stringToParse = stringToParse.append("\0");
     }
     private void performOperation(char c){
+        
         switch(c){
             case '+':
                 y = valueStack.pop();
@@ -112,13 +118,17 @@ public class StackParser {
             case '/':
                 y = valueStack.pop();
                 x = valueStack.pop();
-                if(y==0)
+                if(y==0){
                     throw new IllegalArgumentException("ARG 0!");
+                }
                 valueStack.push(x/y);
                 break;
             case '%':
                 y = valueStack.pop();
                 x = valueStack.pop();
+                if(y==0){
+                    throw new IllegalArgumentException("ARG 0!");
+                }
                 valueStack.push(x%y);
                 break;
             case '^':
@@ -130,7 +140,8 @@ public class StackParser {
                 y = valueStack.pop();
                 valueStack.push(-y);
                 break;
-        }
+        } 
+        
         
     }
     
@@ -184,26 +195,38 @@ public class StackParser {
         
     }
     public void evaluate(){
-        int i=0;
-        char c;
-        StringBuilder num = new StringBuilder();
-        while(i<parsedString.length()){
-            num.setLength(60);
-            c = parsedString.charAt(i);
-            if(Character.isDigit(c)){
-                while(Character.isDigit(c)|| c=='.'){
-                    num.append(c);
-                    i++;
-                    c = parsedString.charAt(i);
-                } 
-                valueStack.push(Double.parseDouble(num.toString()));
+        try{
+            int i=0;
+            char c;
+            StringBuilder num = new StringBuilder();
 
-            }//end of isDigit test
-            if (isOper(c)){
-                performOperation(c);
-            }
-            i++;    
-        } //end of evaluating loop
+            while(i<parsedString.length()){
+                if(error)break;
+                num.setLength(60);
+                c = parsedString.charAt(i);
+                if(Character.isDigit(c)){
+                    while(Character.isDigit(c)|| c=='.'){
+                        num.append(c);
+
+                        i++;
+                        c = parsedString.charAt(i);
+                    } 
+                    valueStack.push(Double.parseDouble(num.toString()));
+
+                }//end of isDigit test
+
+                if (isOper(c)){
+                    performOperation(c);
+                }
+                i++;    
+            } //end of evaluating loop
+        }
+        catch(IllegalArgumentException ex){
+           JOptionPane.showMessageDialog(null,ex.getMessage(),"",JOptionPane.ERROR_MESSAGE);
+           error = true;
+           //valueStack.push(1.0);
+           return;
+        }
         
     }
 }

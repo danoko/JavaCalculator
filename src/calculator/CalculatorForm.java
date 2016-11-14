@@ -1,6 +1,7 @@
 
 package calculator;
 
+import java.lang.Thread.UncaughtExceptionHandler;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.regex.Matcher;
@@ -684,12 +685,16 @@ public class CalculatorForm extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this,"error unbalanced paretheses","",JOptionPane.ERROR_MESSAGE);
             return;
         }
-        
-        if((state==State.NUM)||(state==State.RParen))
+
+        if((state==State.NUM)||(state==State.RParen)|| (state==State.ZERO))
         {
             parser.setStringToParse(new StringBuilder(jTextResult.getText()));
             parser.parse();
             parser.evaluate();
+            if(parser.isError()){
+                jButtonClearActionPerformed(null);
+                return;
+            }
             result = parser.getValueStack().pop();
             jTextResult.setText(format.format(result));
             state = State.RESULT;
@@ -702,7 +707,7 @@ public class CalculatorForm extends javax.swing.JFrame {
             parser.evaluate();
             jTextResult.setText(format.format(parser.getValueStack().peek()));
         }
-        
+
         Pattern pattern = Pattern.compile("(\\.)");
         Matcher matcher = pattern.matcher(jTextResult.getText());
         if(matcher.find())
@@ -735,11 +740,18 @@ public class CalculatorForm extends javax.swing.JFrame {
         }
         return 0;
     }
+    
+    public static void setGlobalExceptionHandler(){
+        
+    }
+    
     public static void main(String args[]) {
        
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new CalculatorForm().setVisible(true);
+                
+                    CalculatorForm form1 = new CalculatorForm();
+                    form1.setVisible(true);
             }
         });
     }
