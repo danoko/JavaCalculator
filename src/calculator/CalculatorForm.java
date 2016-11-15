@@ -22,7 +22,7 @@ public class CalculatorForm extends javax.swing.JFrame {
     private State state = State.START;
     private StringBuffer stringToParse = new StringBuffer();
     //class defined in StackParser.java
-    private StackParser parser = new StackParser();
+    private StackParser parser;
     private double result;
     //flag of state to control the use of +\- button
     private boolean uminus = false;
@@ -497,6 +497,7 @@ public class CalculatorForm extends javax.swing.JFrame {
             parenCount = 0;
             state = State.START;
             uminus = false;
+            parser = null;
         }
     }//GEN-LAST:event_jButtonClearActionPerformed
 
@@ -563,8 +564,9 @@ public class CalculatorForm extends javax.swing.JFrame {
     private void jButton0ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton0ActionPerformed
         
         if(numberOfChars>limitOfChars || state==State.START ||state == State.ZERO)return;
-        
-        if(state==State.OPER){
+        if(state==State.RESULT)
+            jButtonClearActionPerformed(null);
+        else if(state==State.OPER){
             jTextResult.setText(jTextResult.getText()+"0");
             state = State.ZERO;
         }
@@ -685,7 +687,7 @@ public class CalculatorForm extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this,"error unbalanced paretheses","",JOptionPane.ERROR_MESSAGE);
             return;
         }
-
+        parser = new StackParser();
         if((state==State.NUM)||(state==State.RParen)|| (state==State.ZERO))
         {
             parser.setStringToParse(new StringBuilder(jTextResult.getText()));
